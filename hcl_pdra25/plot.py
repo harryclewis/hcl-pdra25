@@ -28,11 +28,13 @@ def plot_ts(ax, var, **kwargs):
 
     # set up legend
     if kwargs.get('labels', None) is not None:
-        ax.legend(kwargs['labels'], ncol=1, labelcolor='linecolor', labelspacing=0.15, handlelength=0.0, loc='center left', alignment='left', bbox_to_anchor=(0.965,0.5), frameon=False)
+        legend_bbox = kwargs.get('legend_bbox', (0.965,0.5))
+        ax.legend(kwargs['labels'], ncol=1, labelcolor='linecolor', labelspacing=0.15, handlelength=0.0, loc='center left', alignment='left', bbox_to_anchor=legend_bbox, frameon=False)
     
     # set up y-label
     if kwargs.get('ylabel', None) is not None:
-        ax.set_ylabel(kwargs['ylabel'], labelpad=50, ha='center', va='center')
+        y_labelpad = kwargs.get('y_labelpad', 50)
+        ax.set_ylabel(kwargs['ylabel'], labelpad=y_labelpad, ha='center', va='center')
 
     # set up y-limits
     if kwargs.get('ylim', None) is not None:
