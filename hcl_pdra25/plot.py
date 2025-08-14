@@ -102,7 +102,7 @@ def plot_spectr(fig, ax, var, **kwargs):
         ax.set_yticks([0,45,90,135,180], labels=['$0$','$45$','$90$','$135$','$180$'])
         ax.set_yticks([15,30,60,75,105,120,150,165], minor=True)
 
-    pcm = ax.pcolormesh(X, Y, Z.T, rasterized=True, shading="auto",norm=kwargs.get('norm', mpl.colors.LogNorm()), cmap='turbo')
+    pcm = ax.pcolormesh(X, Y, Z.T, rasterized=True, shading="auto",norm=kwargs.get('norm', mpl.colors.LogNorm()), cmap=kwargs.get('cmap','turbo'))
     pos = ax.get_position()
     cax = fig.add_axes([pos.x0 + pos.width +0.005, pos.y0, 0.01, pos.height])
     cbar = fig.colorbar(mappable=pcm, cax=cax, ax=ax, orientation="vertical")
