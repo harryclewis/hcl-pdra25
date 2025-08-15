@@ -5,8 +5,18 @@ Contains plotting functions.
 """
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
+
+
+""" Class to store information about a particular spectogram"""
+class Spectogram:
+    def __init__(self, x, y, z):
+        self.x = x # x-axis, usually times
+        self.y = y # y-axis, usually angles or energies
+        self.z = z # z-axis, usually eV/cm^2 s sr eV
+
 
 """ Function to plot a timeseries on a given axis """
 def plot_ts(ax, var, **kwargs):
@@ -117,4 +127,36 @@ def plot_spectr(fig, ax, var, **kwargs):
     ax.set_ylabel(kwargs['ylabel'], labelpad=50, ha='center', va='center')
     cax.set_ylabel(kwargs['label'], fontsize=23)
     cax.yaxis.set_major_locator(mticker.LogLocator(base=10, numticks=7))
-    return Z
+
+    result = Spectogram(X, Y, Z)
+    return result
+
+
+""" Function to take and plot a 1D cut """
+def PAD_1D_cut(PAD_channel, target_time: str, title: str = "", **kwargs):
+
+    # index of closest time to target
+    idx = np.argmin(np.abs(PAD_channel.x - np.datetime64(target_time)))
+
+    # get the 1D slice at idx
+    cut = PAD_channel.z[idx,:]
+
+    # plot the 1D slice
+    fig, ax = plt.subplots(1,1,figsize=(8,6))
+    ax.step(PAD_channel.y, np.r_[cut, cut[-1]], where='post')
+
+    # x axis
+    ax.set_xlabel(r'$\mathrm{Angle}~[^\circ]$')
+    ax.set_xlim(0,180)
+    ax.set_xticks([0,45,90,135,180], labels=['$0$','$45$','$90$','$135$','$180$'])
+    ax.set_xticks([15,30,60,75,105,120,150,165], minor=True)
+
+    # y axis
+    if not kwargs.get('y_lim', None) is None:
+        ax.set_ylim(kwargs.get('y_lim')[0], kwargs.get('y_lim')[-1])
+    ax.set_yscale('log')
+    ax.set_ylabel(r'$\mathrm{Electron~PAD}$' '\n' r'$\mathrm{[eV/cm^2\,s\,sr\,eV]}$')
+
+    # Plot format
+    ax.set_title(f'{title} ({target_time})', fontsize=28, pad=20)
+    plt.show()
