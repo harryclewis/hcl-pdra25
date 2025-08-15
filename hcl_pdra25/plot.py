@@ -77,7 +77,7 @@ def plot_spectr(fig, ax, var, **kwargs):
     dt = np.median(np.sort(np.diff(times)))
     times_shifted = times - dt / 2 
     X = np.concatenate((times_shifted, np.array([times[-1] + dt/2])))
-    yaxis = kwargs.get('yaxis', None)
+    yaxis = kwargs.get('yaxis', 'e_pad')
     
     if yaxis.lower() in ['e_spectro','i_spectro']:
         # plot spectrogram
@@ -102,7 +102,15 @@ def plot_spectr(fig, ax, var, **kwargs):
         ax.set_yticks([0,45,90,135,180], labels=['$0$','$45$','$90$','$135$','$180$'])
         ax.set_yticks([15,30,60,75,105,120,150,165], minor=True)
 
-    pcm = ax.pcolormesh(X, Y, Z.T, rasterized=True, shading="auto",norm=kwargs.get('norm', mpl.colors.LogNorm()), cmap=kwargs.get('cmap','turbo'))
+    # define the norm, min_max being the full range in Z
+    if isinstance(kwargs.get('norm'), str):
+        if kwargs.get('norm').lower() == 'min_max':
+            Z_no_zeros = np.where(Z==0.0,np.nan,Z)
+            norm = mpl.colors.LogNorm(vmin=np.nanmin(Z_no_zeros), vmax=np.nanmax(Z_no_zeros))
+    else:
+        norm = kwargs.get('norm', mpl.colors.LogNorm())
+
+    pcm = ax.pcolormesh(X, Y, Z.T, rasterized=True, shading="flat", norm=norm, cmap=kwargs.get('cmap','turbo'))
     pos = ax.get_position()
     cax = fig.add_axes([pos.x0 + pos.width +0.005, pos.y0, 0.01, pos.height])
     cbar = fig.colorbar(mappable=pcm, cax=cax, ax=ax, orientation="vertical")
