@@ -1,2 +1,2 @@
 # PDRA Tools (2025)
-This library contains common functions for my space physics research, primarily designed for Parker Solar Probe (PSP) data obtained from the [AMDA](https://amda.irap.omp.eu/) database via [SciQLop/Speasy](https://github.com/SciQLop/speasy). Various plotting, science, and utility functions are also included.
+This library contains common data and plotting routines for my space physics research, primarily designed for Parker Solar Probe (PSP) data obtained from the [AMDA](https://amda.irap.omp.eu/) database via [SciQLop/Speasy](https://github.com/SciQLop/speasy).
