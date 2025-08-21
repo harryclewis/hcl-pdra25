@@ -61,3 +61,18 @@ def tplot_to_npy(filename: str = '', vars: list = [], save_dir: str = ''):
         d = xr.values
         np.save(save_dir+var+'_t', t, allow_pickle=False)
         np.save(save_dir+var, d, allow_pickle=False)
+
+
+""" Function to process PSP temperature data (from AMDA) into the symmetric temperature tensor"""
+def construct_temperature_tensor(T):
+    Ttens = np.zeros((T.shape[0], 3, 3))
+    Ttens[:,0,0] = T[:,0] # Txx
+    Ttens[:,1,1] = T[:,1] # Tyy
+    Ttens[:,2,2] = T[:,2] # Tzz
+    Ttens[:,0,1] = T[:,3] # Txy
+    Ttens[:,1,0] = T[:,3] # Tyx
+    Ttens[:,0,2] = T[:,4] # Txz
+    Ttens[:,2,0] = T[:,4] # Tzx
+    Ttens[:,1,2] = T[:,5] # Tyz
+    Ttens[:,2,1] = T[:,5] # Tzy
+    return Ttens
