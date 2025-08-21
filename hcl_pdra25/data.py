@@ -4,7 +4,6 @@ hcl_pdra25: data.py
 Contains useful data functions.
 """
 
-
 import numpy as np
 
 
