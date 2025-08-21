@@ -45,3 +45,20 @@ def calculate_alpha(n_inp, T_parr_inp, T_perp1_inp, T_perp2_inp, B_inp):
     # calculate alpha
     alpha = 1 - np.einsum('t,t->t', mu0_P_diff, np.square(np.reciprocal(B_mag)))
     return alpha
+
+
+""" Calculate the local Alfven speed from Speasy variables"""
+def calculate_vA(n_inp, B_inp, species: str = 'p'):
+
+    assert species in ['e','p'], "Available species options are 'e','i'."
+    assert len(n_inp.values) == len(B_inp.values), "B must be interpolated onto n cadence prior to calling."
+
+    # convert to SI units
+    n = np.squeeze(n_inp.values) * 1e6
+    B_mag = np.linalg.norm(B_inp.values, axis=1) * 1e-9
+
+    # get correct mass for species selection
+    m = constants.m_p if species == 'p' else constants.m_e
+    rho = m * n
+    v_A = np.einsum('t,t->t', B_mag, np.reciprocal(np.sqrt(constants.mu_0 * rho)))
+    return v_A
