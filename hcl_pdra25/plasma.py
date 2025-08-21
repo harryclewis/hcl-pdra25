@@ -9,16 +9,16 @@ from scipy import constants
 from speasy.signal.resampling import interpolate
 
 
-""" Routine to calculate the plasma beta from Speasy-like variables in SI units """
-def calculate_beta(n_SI, T_SI, B_mag_SI):
+""" Routine to calculate the plasma beta from Speasy-like variables in default units """
+def calculate_beta(n_inp, T_inp, B_mag_inp):
 
     # Interpolate magnetic field onto temperature cadence
-    B_mag_ds_SI = interpolate(T_SI, B_mag_SI)
+    B_mag_ds_inp = interpolate(T_inp, B_mag_inp)
 
     # convert to SI units
-    n = n_SI.values * 1e6
-    T = T_SI.values * constants.elementary_charge
-    B_mag = B_mag_ds_SI.values * 1e-9
+    n = n_inp.values * 1e6
+    T = T_inp.values * constants.elementary_charge
+    B_mag = B_mag_ds_inp.values * 1e-9
 
     # calculate pressures
     P_th = np.multiply(n, T)
@@ -26,3 +26,22 @@ def calculate_beta(n_SI, T_SI, B_mag_SI):
 
     # Plasma beta is P_th/P_mag
     return np.squeeze(np.divide(P_th, P_mag))
+
+
+""" Calculate the firehose parameter, alpha = 1 - mu0*(P_parr - P_perp)/B^2. If no T_perp2, use T_perp1 again. """
+def calculate_alpha(n_inp, T_parr_inp, T_perp1_inp, T_perp2_inp, B_inp):
+
+    # convert to SI units
+    T_parr = T_parr_inp.values * constants.elementary_charge
+    T_perp = (T_perp1_inp.values * constants.elementary_charge + T_perp2_inp.values * constants.elementary_charge)/2
+    n = np.squeeze(n_inp.values) * 1e6
+    B_mag = np.linalg.norm(B_inp.values, axis=1) * 1e-9
+
+    # calculate the pressure components
+    P_parr = np.einsum('t,t->t', T_parr, n)
+    P_perp = np.einsum('t,t->t', T_perp, n)
+    mu0_P_diff = constants.mu_0 * np.subtract(P_parr, P_perp)
+    
+    # calculate alpha
+    alpha = 1 - np.einsum('t,t->t', mu0_P_diff, np.square(np.reciprocal(B_mag)))
+    return alpha
