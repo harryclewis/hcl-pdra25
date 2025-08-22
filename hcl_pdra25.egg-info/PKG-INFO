@@ -10,4 +10,5 @@ Requires-Dist: cycler>=0.12.1
 Requires-Dist: spiceypy>=6.0.3
 Requires-Dist: matplotlib>=3.10.1
 
-Readme TBA.
+# PDRA Tools (2025)
+This library contains common data and plotting routines for my space physics research, primarily designed for Parker Solar Probe (PSP) data obtained from the [AMDA](https://amda.irap.omp.eu/) database via [SciQLop/Speasy](https://github.com/SciQLop/speasy).

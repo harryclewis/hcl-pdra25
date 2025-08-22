@@ -1,9 +1,12 @@
 README.md
 pyproject.toml
 hcl_pdra25/__init__.py
+hcl_pdra25/basis.py
 hcl_pdra25/data.py
 hcl_pdra25/mva.py
+hcl_pdra25/plasma.py
 hcl_pdra25/plot.py
+hcl_pdra25/remote.py
 hcl_pdra25.egg-info/PKG-INFO
 hcl_pdra25.egg-info/SOURCES.txt
 hcl_pdra25.egg-info/dependency_links.txt
