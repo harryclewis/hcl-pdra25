@@ -1,2 +1,12 @@
 # PDRA Tools (2025)
-This library contains common data and plotting routines for my space physics research, primarily designed for Parker Solar Probe (PSP) data obtained from the [AMDA](https://amda.irap.omp.eu/) database via [SciQLop/Speasy](https://github.com/SciQLop/speasy).
+This library contains common data and plotting routines for my space physics research, primarily designed for Parker Solar Probe (PSP) data obtained from the [AMDA](https://amda.irap.omp.eu/) database via [SciQLop/Speasy](https://github.com/SciQLop/speasy). In addition, there are some routines to process and display remote sensing image data from PSP and Solar Orbiter obtained via the [SunPy](https://sunpy.org/) package.
+
+# Installation
+This package is quite specialised, so it is not currently available to download through pip. Here is a suggested installation process:
+1. Download the repository as a .zip file
+2. Extract to a folder of your choice
+3. Open your terminal at the the extracted folder
+4. Activate your chosen virtual environment
+5. Execute `pip install -e .`
+
+This will install an editable version of the `hcl_pdra25` package to your chosen environment. Other installation methods should work but have not been tested.
