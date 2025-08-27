@@ -6,6 +6,7 @@ Note that routines in this section require SunPy and dependencies to be installe
 """
 
 from astropy.coordinates import SkyCoord
+from astropy.timeseries import TimeSeries
 import astropy.units as u
 from astropy.visualization import ImageNormalize, PowerStretch
 import astropy.wcs
@@ -14,6 +15,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from reproject import reproject_interp
 from reproject.mosaicking import reproject_and_coadd
+from scipy.interpolate import RegularGridInterpolator
+from scipy.signal import savgol_filter
 import sunpy
 from sunpy.coordinates.frames import Helioprojective
 
@@ -93,6 +96,44 @@ def produce_jmap(i_start, i_end, map_sequence, X_vec, Y_vec, Z_vec, rot_axis='X'
     plt.show()
 
     return j_map, j_map_dates
+
+
+"""
+    Interpolate over 'bad' jmap indices (e.g. contaminated by dust)
+    Uses a Savitzky-Golay filter to smooth, as a separate output
+
+    Returns regular timeseries of dates, the interpolated data, and filtered data
+"""
+def interpolate_jmap(data, t_s="", remove_idxs: list=[], dt=300*u.s, n_samples=None, window_length: int=2, polyorder: int=0):
+
+    assert t_s != "", "A start time is needed for the regular time series interpolation."
+
+    if n_samples is None:
+        n_samples = data.shape[0]
+
+    # Define a regular time series
+    ts_regular = np.array(TimeSeries(time_start=t_s, time_delta=dt, n_samples=n_samples).to_pandas().index.values)
+
+    # Define a meshgrid for the interpolator object (currently works in data coords i.e. indices)
+    _X = np.arange(0, data.shape[0])
+    _Y = np.arange(0, data.shape[-1])
+    _Xg, _Yg = np.meshgrid(_X, _Y, indexing='ij', sparse=True)
+
+    # Remove the 'bad' indices from data (axis 0) and _X
+    for idx in remove_idxs:
+        data = np.delete(data, (idx), axis=0)
+        _X = np.delete(_X, (idx), axis=0)
+
+    # Define interpolator object
+    interp = RegularGridInterpolator((_X, _Y), data)
+
+    # Interpolate data to regular grid
+    data_interp = interp((_Xg, _Yg))
+
+    # Apply filter to interpolated data
+    data_filter = savgol_filter(data_interp, window_length=window_length, polyorder=polyorder, axis=0)
+
+    return ts_regular, data_interp, data_filter
 
 
 """ Combine two WISPR maps, a la heliophysicsPy Summer School 2024 """
