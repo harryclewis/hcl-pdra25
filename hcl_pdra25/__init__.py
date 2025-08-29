@@ -1,1 +1,1 @@
-__all__ = ['plot.py','data.py', 'mva.py','plasma.py','remote.py']
+__all__ = ['plot.py','data.py', 'mva.py','plasma.py','remote.py','animate.py']
