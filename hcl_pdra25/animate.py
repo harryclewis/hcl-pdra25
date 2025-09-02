@@ -150,3 +150,34 @@ def create_wispr_video(sequence, zero_coord, X_coord, Y_coord, Z_coord, dt=1000/
     )
 
     return anim
+
+
+"""
+    Function to animate a sequence of Solar Orbiter EUI maps.
+    
+    Basic plot without any additionals: simply SolO's view.
+"""
+def create_EUI_video(sequence, dt=1000/5):
+    fig = plt.figure(figsize=(12,12))
+    global ax
+    ax = fig.add_subplot(projection=sequence[0])
+
+    def animate(t):
+        global ax
+        ax.remove()
+        ax = fig.add_subplot(projection=sequence[t])
+        ax.set_xlim(0.15*3600,0.7*3600)
+        ax.set_ylim(0.15*3600,0.7*3600)
+        lon, lat = ax.coords
+        lon.set_major_formatter('d')
+        lat.set_major_formatter('d')
+        sequence[t].plot(axes=ax, cmap='viridis')
+
+    anim = FuncAnimation(
+        fig,
+        animate,
+        frames=len(sequence),
+        interval=dt
+    )
+
+    return anim
