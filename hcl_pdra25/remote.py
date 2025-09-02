@@ -5,7 +5,7 @@ Functions specific to the remote sensing missions WISPR and EUI from PSP and Sol
 Note that routines in this section require SunPy and dependencies to be installed.
 """
 
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, cartesian_to_spherical
 from astropy.timeseries import TimeSeries
 import astropy.units as u
 from astropy.visualization import ImageNormalize, PowerStretch
@@ -165,3 +165,17 @@ def combine_wispr_maps(inner_map, outer_map):
     combined_map.plot_settings["norm"] = wispr_norm
     combined_map.plot_settings["cmap"] = "viridis"
     return combined_map
+
+
+""" 
+    Converts cartesian vector to spherical coordinates (wrapper for astropy) in degrees.
+    Set conv=1 for radians. 
+    Returns values as numpy floats
+"""
+def cart_to_sph_deg(x, y, z, conv = 57.29583337126, mul = 1):
+
+    # wrap the astropy function and extract data
+    _, lat, lon = cartesian_to_spherical(x, y, z)
+
+    # return the values
+    return lon.value * conv * mul, lat.value * conv * mul
