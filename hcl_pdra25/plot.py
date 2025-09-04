@@ -79,6 +79,70 @@ def plot_ts(ax, var, **kwargs):
         ax.axhline(kwargs['y_line'], c='black',ls='dashed')
 
 
+""" Function to plot a feather on a given time series axis """
+def plot_feather(ax, times, data, **kwargs):
+
+    # skip every n points
+    skip = kwargs.get('skip',1)
+
+    # retrieve which two components to get
+    x_cmpt, y_cmpt = kwargs.get('components',[1,0])
+
+    # using quiver to plot a feather plot
+    axs[idx].quiver(
+        times[::skip], 
+        np.zeros(times.shape)[::skip], 
+        data[::skip,x_cmpt], 
+        data[::skip,y_cmpt], 
+        angles=kwargs.get('angles','uv'), 
+        scale_units=kwargs.get('scale_units','y'), 
+        scale=kwargs.get('scale',1), 
+        width=kwargs.get('width',0.0005)
+    )
+
+    # set up legend
+    if kwargs.get('labels', None) is not None:
+        legend_bbox = kwargs.get('legend_bbox', (0.965,0.5))
+        ax.legend(kwargs['labels'], ncol=1, labelcolor='linecolor', labelspacing=0.15, handlelength=0.0, loc='center left', alignment='left', bbox_to_anchor=legend_bbox, frameon=False)
+    
+    # set up y-label
+    if kwargs.get('ylabel', None) is not None:
+        y_labelpad = kwargs.get('y_labelpad', 50)
+        ax.set_ylabel(kwargs['ylabel'], labelpad=y_labelpad, ha='center', va='center')
+
+    # set up y-limits
+    if kwargs.get('ylim', None) is not None:
+        ax.set_ylim(kwargs['ylim'])
+
+    # y-tick locators
+    if kwargs.get('y_log', False):
+        ax.yaxis.set_major_locator(mticker.LogLocator())
+        ax.set_yscale('log')
+    else:
+        ax.yaxis.set_major_locator(mticker.MaxNLocator(5))
+
+    # text to show that values are scaled (e.g. x10^10)
+    if kwargs.get('scaling_text', None) is not None:
+        ax.text(0.01, 0.97, kwargs['scaling_text'], transform=ax.transAxes, ha='left', va='top')
+
+    # add a line at x-axis zero
+    if kwargs.get('zero_line', False):
+        ax.axhline(0.0, c='black', zorder=0)
+
+    # add text, either in default location or specified in the kwarg
+    if kwargs.get('text', None) is not None:
+        txt = kwargs['text']
+        if isinstance(txt, str):
+            t = ax.text(1.00, 1.00, txt, transform=ax.transAxes, ha='right', va='center', fontsize=20)
+            t.set_bbox(dict(facecolor='white', alpha=0.7, edgecolor='black'))
+        else:
+            ax.text(txt[1], txt[2], txt[0], transform=ax.transAxes, ha=txt[3], va=txt[4], fontsize=20)
+
+    # add a horizontal line if requested
+    if kwargs.get('y_line', None) is not None:
+        ax.axhline(kwargs['y_line'], c='black',ls='dashed')
+
+
 """ Function to plot a spectogram on a given axis """
 def plot_spectr(fig, ax, var, **kwargs):
 
