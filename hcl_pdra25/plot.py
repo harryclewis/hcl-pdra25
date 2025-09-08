@@ -89,7 +89,7 @@ def plot_feather(ax, times, data, **kwargs):
     x_cmpt, y_cmpt = kwargs.get('components',[1,0])
 
     # using quiver to plot a feather plot
-    axs[idx].quiver(
+    ax.quiver(
         times[::skip], 
         np.zeros(times.shape)[::skip], 
         data[::skip,x_cmpt], 
