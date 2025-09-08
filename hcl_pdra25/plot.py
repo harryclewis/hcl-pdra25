@@ -82,7 +82,7 @@ def plot_ts(ax, var, **kwargs):
 """ Function to plot a feather on a given time series axis """
 def plot_feather(ax, times, data, **kwargs):
 
-    # skip every n points
+    # skip every so many points
     skip = kwargs.get('skip',1)
 
     # retrieve which two components to get
