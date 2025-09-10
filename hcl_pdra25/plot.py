@@ -224,3 +224,101 @@ def PAD_1D_cut(PAD_channel, target_time: str, title: str = "", **kwargs):
     # Plot format
     ax.set_title(f'{title} ({target_time})', fontsize=28, pad=20)
     plt.show()
+
+
+""" Routine to plot B and v field feathers along an orbit trajectory"""
+def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, ax_vec=(), **kwargs):
+
+    # get which axes idx to print
+    which_options = [['xy','xz','yz'],[(0,1),(0,2),(1,2)]]
+    which = kwargs.get('which', 'xy')
+    assert which in which_options[0], f"Only {which_options[0]} are supported vector components."
+    ax1, ax2 = which_options[-1][which_options[0].index(which)]
+
+    fig = plt.figure(figsize=kwargs.get('figsize',(13,13)))
+    ax = fig.add_subplot()
+
+    ax.plot(scpos_us[:,ax1], scpos_us[:,ax2], label=kwargs.get('orbitlabel',None), color='purple')
+
+    # Magnetic field feather
+    ax.quiver(
+        scpos_us[::iskip_B, ax1], 
+        scpos_us[::iskip_B, ax2], 
+        B_vec[::iskip_B, ax1], 
+        B_vec[::iskip_B, ax2], 
+        angles='uv', scale_units='dots', scale=10*kwargs.get('scale_multiplier',1), width=0.0025
+    )
+
+    # velocity field feather
+    ax.quiver(
+        scpos_ds[::iskip_v, ax1], 
+        scpos_ds[::iskip_v, ax2], 
+        v_vec[::iskip_v,ax1], 
+        v_vec[::iskip_v,ax2], 
+        1,
+        alpha=0.7,
+        angles='uv', scale_units='dots', scale=5*kwargs.get('scale_multiplier',1), width=0.0025,
+        cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
+    )
+
+    ### PLOT LMN ARROWS ###
+    if not ax_vec == ():
+        X_vec, Y_vec, Z_vec = ax_vec
+        zero_loc = kwargs.get('eg_axis_loc', [0,0])
+
+        # X arrow, red
+        ax.quiver(
+            zero_loc[0], 
+            zero_loc[1], 
+            X_vec[ax1], 
+            X_vec[ax2], 
+            1,
+            angles='uv', scale_units='dots', scale=0.02, width=0.005,
+            cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
+        )
+
+        # Y arrow, blue
+        ax.quiver( 
+            zero_loc[0], 
+            zero_loc[1], 
+            Y_vec[ax1], 
+            Y_vec[ax2], 
+            -1,
+            angles='uv', scale_units='dots', scale=0.02, width=0.005,
+            cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
+        )
+
+        # z arrow, green
+        ax.quiver(
+            zero_loc[0], 
+            zero_loc[1], 
+            Z_vec[ax1], 
+            Z_vec[ax2], 
+            1,
+            angles='uv', scale_units='dots', scale=0.02, width=0.005,
+            cmap='PiYG', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
+        )
+
+    # Plot any custom scatter point markers
+    if kwargs.get('custom_scatter', None) is not None:
+        for key, item in kwargs.get('custom_scatter').items():
+            ax.scatter(scpos_ds[item['idx'], ax1], scpos_ds[item['idx'], ax2], marker=item['marker'], s=item['s'], fc=item['fc'], ec=item['ec'], zorder=100, label=item['label'])
+
+    if kwargs.get('flip_x_axis', False):
+        xlim_before_flip = ax.get_xlim()
+        ax.set_xlim(xlim_before_flip[-1], xlim_before_flip[0])
+    if kwargs.get('stretch_x_axis', 1) != 1:
+        x_stretch_factor = kwargs.get('stretch_x_axis', 1)
+        xlim_before_stretch = ax.get_xlim()
+        xlim_midpoint = np.mean(xlim_before_stretch)
+        xlim_range = xlim_before_stretch[-1] - xlim_before_stretch[0]
+        ax.set_xlim(xlim_midpoint - (xlim_range/2)*x_stretch_factor, xlim_midpoint + (xlim_range/2)*x_stretch_factor)
+    ax.set_xlabel(kwargs.get('xlabel',None))
+    ax.set_ylabel(kwargs.get('ylabel',None))
+    ax.set_title(kwargs.get('title', None))
+    ax.grid()
+    ax.legend(loc='lower right', ncol=1, fontsize=14)
+    if kwargs.get('equal', True):
+        ax.set_aspect('equal')
+
+    plt.show()
