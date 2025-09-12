@@ -256,7 +256,7 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
         v_vec[::iskip_v,ax1], 
         v_vec[::iskip_v,ax2], 
         1,
-        alpha=0.7,
+        alpha=0.5,
         angles='uv', scale_units='dots', scale=5*kwargs.get('scale_multiplier',1), width=0.0025,
         cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
     )
@@ -273,7 +273,7 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
             X_vec[ax1], 
             X_vec[ax2], 
             1,
-            angles='uv', scale_units='dots', scale=0.02, width=0.005,
+            angles='uv', scale_units='inches', units='inches', scale=1, width=0.03, zorder=50,
             cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
         )
 
@@ -284,7 +284,7 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
             Y_vec[ax1], 
             Y_vec[ax2], 
             -1,
-            angles='uv', scale_units='dots', scale=0.02, width=0.005,
+            angles='uv', scale_units='inches', units='inches', scale=1, width=0.03, zorder=50,
             cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
         )
 
@@ -295,7 +295,7 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
             Z_vec[ax1], 
             Z_vec[ax2], 
             1,
-            angles='uv', scale_units='dots', scale=0.02, width=0.005,
+            angles='uv', scale_units='inches', units='inches', scale=1, width=0.03, zorder=50,
             cmap='PiYG', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
         )
 
