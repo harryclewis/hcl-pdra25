@@ -322,3 +322,19 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
         ax.set_aspect('equal')
 
     plt.show()
+
+
+""" Routine to estimate PAD bin edges from bin centers"""
+def get_bin_edges(centers):
+
+    # For readability
+    log_bins = np.log10(centers)
+    log_bins_diff = np.diff(log_bins)
+
+    # Assume even spacing in log-space
+    log_bin_edges = np.r_[log_bins[0]-log_bins_diff[0]/2, np.add(log_bins[:-1], log_bins_diff/2), log_bins[-1]+log_bins_diff[-1]/2]
+
+    # 10^x
+    bin_edges = np.power(10, log_bin_edges)
+
+    return bin_edges
