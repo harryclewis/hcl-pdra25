@@ -4,12 +4,19 @@ hcl_pdra25: animate.py
 Contains animation functions.
 """
 
-
+# 3rd party
 import astropy.units as u
 from astropy.visualization import ImageNormalize, PowerStretch
 from matplotlib.animation import FuncAnimation
+import matplotlib as mpl
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import numpy as np
+import pandas as pd
+
+# 1st party
+from data import CustomVariable
 
 
 """
@@ -179,5 +186,63 @@ def create_EUI_video(sequence, dt=1000/5):
         frames=len(sequence),
         interval=dt
     )
+
+    return anim
+
+
+""" Routine to animate electron PAD with B_lmn timeseries above """
+def animate_PAD(b_lmn_time, b_lmn_data, pad, bins, **kwargs):
+    fig = plt.figure(figsize=(15,10))
+    ax_ts = fig.add_subplot(6,1,1)
+    plot_ts(ax_ts, CustomVariable(b_lmn_time, b_lmn_data), labels=[r'$B_L$',r'$B_M$',r'$B_N$'], ylabel=r'$\mathbf{B}_\mathrm{LMN}$' '\n' r'$\mathrm{[nT]}$', zero_line=True)
+    majorlocator = mdates.AutoDateLocator(minticks=3, maxticks=12)
+    minorlocator = mdates.MinuteLocator(byminute=np.arange(0,60,10))
+    formatter = mdates.ConciseDateFormatter(majorlocator, usetex=True, zero_formats=['', '%Y', '%b', '%-d %b', '%H:%M', '%H:%M'])
+    ax_ts.xaxis.set_major_locator(majorlocator)
+    ax_ts.xaxis.set_minor_locator(minorlocator)
+    ax_ts.xaxis.set_major_formatter(formatter)
+    ax_ts.set_xlim(pd.to_datetime(t_start), pd.to_datetime(t_end))
+
+    ax_polar = fig.add_subplot(6,1,(2,6), projection='polar')
+
+    e_bin_edges = get_bin_edges(bins)
+    bottom_bin, top_bin = kwargs.get('binrange', (31, 0))
+
+    # Set up the polar plot
+    ax_polar.set_thetamin(0)
+    ax_polar.set_thetamax(180)
+    ax_polar.set_rmin(bins[bottom_bin]*0.9)
+    ax_polar.set_rmax(bins[top_bin]*1.1)
+    ax_polar.set_rscale('log')
+    ax_polar.set_position(pos=[0,-0.25,1,1.1])
+
+    # Set the colour-axis range
+    if not kwargs.get('vlim', None) is None:
+        vmin, vmax = kwargs.get('vlim')
+    else:
+        vmin = np.nanmin(pad.values[pad.values>0.0])
+        vmax = np.nanmax(pad.values)
+
+    # Create the animated objects
+    pc = ax_polar.pcolormesh(angles, e_bin_edges, pad.values[0,:,:].T, cmap='turbo', norm=mpl.colors.LogNorm(vmin=vmin, vmax=vmax))
+    vl = ax_ts.axvline(pad.time[0], c='black')
+
+    # Animate the animated objects!
+    def animate(ii):
+        pc.set_array(pad.values[ii,:,:].T)
+        vl.set_xdata([pad.time[ii], pad.time[ii]])
+        return  
+
+    # The animation itself, currently 0.1s cadence default
+    anim = FuncAnimation(
+        fig,
+        animate,
+        frames=kwargs.get('frames', len(pad.time)),
+        interval=kwargs.get('dt', 100),
+        blit=False
+    )
+
+    fig.subplots_adjust(left=0.2, right=0.9, bottom=-0.15, hspace=-0.3)
+    # plt.close()
 
     return anim
