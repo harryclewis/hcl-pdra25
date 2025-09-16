@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 # 1st party
-from data import CustomVariable
+from .data import CustomVariable
 
 
 """
