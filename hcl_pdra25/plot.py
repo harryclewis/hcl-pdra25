@@ -250,16 +250,17 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
     )
 
     # velocity field feather
-    ax.quiver(
-        scpos_ds[::iskip_v, ax1], 
-        scpos_ds[::iskip_v, ax2], 
-        v_vec[::iskip_v,ax1], 
-        v_vec[::iskip_v,ax2], 
-        1,
-        alpha=0.5,
-        angles='uv', scale_units='dots', scale=5*kwargs.get('scale_multiplier',1), width=0.0025,
-        cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
-    )
+    if kwargs.get('plot_velocity', False):
+        ax.quiver(
+            scpos_ds[::iskip_v, ax1], 
+            scpos_ds[::iskip_v, ax2], 
+            v_vec[::iskip_v,ax1], 
+            v_vec[::iskip_v,ax2], 
+            1,
+            alpha=0.5,
+            angles='uv', scale_units='dots', scale=5*kwargs.get('scale_multiplier',1), width=0.0025,
+            cmap='bwr', norm=mpl.colors.Normalize(vmin=-1, vmax=1)
+        )
 
     ### PLOT LMN ARROWS ###
     if not ax_vec == ():
@@ -307,6 +308,9 @@ def plot_orbit_feather(scpos_us, scpos_ds, B_vec, v_vec, iskip_B=1, iskip_v=1, a
     if kwargs.get('flip_x_axis', False):
         xlim_before_flip = ax.get_xlim()
         ax.set_xlim(xlim_before_flip[-1], xlim_before_flip[0])
+    if kwargs.get('flip_y_axis', False):
+        ylim_before_flip = ax.get_ylim()
+        ax.set_ylim(ylim_before_flip[-1], ylim_before_flip[0])
     if kwargs.get('stretch_x_axis', 1) != 1:
         x_stretch_factor = kwargs.get('stretch_x_axis', 1)
         xlim_before_stretch = ax.get_xlim()
