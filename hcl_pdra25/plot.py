@@ -59,7 +59,7 @@ def plot_ts(ax, var, **kwargs):
 
     # text to show that values are scaled (e.g. x10^10)
     if kwargs.get('scaling_text', None) is not None:
-        ax.text(0.01, 0.97, kwargs['scaling_text'], transform=ax.transAxes, ha='left', va='top')
+        ax.text(0.99, 0.97, kwargs['scaling_text'], transform=ax.transAxes, ha='right', va='top')
 
     # add a line at x-axis zero
     if kwargs.get('zero_line', False):
@@ -77,6 +77,33 @@ def plot_ts(ax, var, **kwargs):
     # add a horizontal line if requested
     if kwargs.get('y_line', None) is not None:
         ax.axhline(kwargs['y_line'], c='black',ls='dashed')
+
+    # add a panel letter (given index starting at 0)
+    if kwargs.get('panel', None) is not None:
+
+        # extract the panel properties and bbox properties from the kwargs
+        panel_props = kwargs.get('panel_props', dict(xloc=0.005, yloc=0.96, va='top', ha='left', transform=ax.transAxes))
+        panel_bbox = kwargs.get('panel_bbox', dict(facecolor='white', alpha=0.85, edgecolor='None'))
+
+        # retrieve EITHER an int from 0 to 25, or a string (without brackets)
+        if isinstance(kwargs['panel'], int):
+            assert kwargs['panel'] < 26, "Automatic panels only work up to 'z'"
+            panel_text = f'({chr(97+kwargs.get('panel'))})'
+        elif isinstance(kwargs['panel'], str):
+            panel_text = kwargs['panel']
+
+        # plot the text object
+        t = ax.text(
+            panel_props['xloc'], 
+            panel_props['yloc'], 
+            panel_text, 
+            va=panel_props['va'], 
+            ha=panel_props['ha'], 
+            transform=panel_props['transform']
+        )
+
+        # modify the bounding box
+        t.set_bbox(panel_bbox)
 
 
 """ Function to plot a feather on a given time series axis """
@@ -191,6 +218,34 @@ def plot_spectr(fig, ax, var, **kwargs):
     ax.set_ylabel(kwargs['ylabel'], labelpad=50, ha='center', va='center')
     cax.set_ylabel(kwargs['label'], fontsize=23)
     cax.yaxis.set_major_locator(mticker.LogLocator(base=10, numticks=7))
+
+
+    # add a panel letter (given index starting at 0)
+    if kwargs.get('panel', None) is not None:
+
+        # extract the panel properties and bbox properties from the kwargs
+        panel_props = kwargs.get('panel_props', dict(xloc=0.005, yloc=0.96, va='top', ha='left', transform=ax.transAxes))
+        panel_bbox = kwargs.get('panel_bbox', dict(facecolor='white', alpha=0.85, edgecolor='None'))
+
+        # retrieve EITHER an int from 0 to 25, or a string (without brackets)
+        if isinstance(kwargs['panel'], int):
+            assert kwargs['panel'] < 26, "Automatic panels only work up to 'z'"
+            panel_text = f'({chr(97+kwargs.get('panel'))})'
+        elif isinstance(kwargs['panel'], str):
+            panel_text = kwargs['panel']
+
+        # plot the text object
+        t = ax.text(
+            panel_props['xloc'], 
+            panel_props['yloc'], 
+            panel_text, 
+            va=panel_props['va'], 
+            ha=panel_props['ha'], 
+            transform=panel_props['transform']
+        )
+
+        # modify the bounding box
+        t.set_bbox(panel_bbox)
 
     result = Spectogram(X, Y, Z)
     return result
