@@ -88,7 +88,7 @@ def plot_ts(ax, var, **kwargs):
         # retrieve EITHER an int from 0 to 25, or a string (without brackets)
         if isinstance(kwargs['panel'], int):
             assert kwargs['panel'] < 26, "Automatic panels only work up to 'z'"
-            panel_text = f'({chr(97+kwargs.get('panel'))})'
+            panel_text = f'({chr(97+kwargs.get("panel"))})'
         elif isinstance(kwargs['panel'], str):
             panel_text = kwargs['panel']
 
