@@ -412,3 +412,58 @@ def get_bin_edges(centers):
     bin_edges = np.power(10, log_bin_edges)
 
     return bin_edges
+
+
+"""Routine to add quality flags to a plot"""
+"""
+    Accepts following inputs:
+    1. ax               : a matplotlib axis object
+    2. time             : a list/array of times (will need formatting)
+    3. cdf_data         : quality flag data from PSP CDF
+    4. flag_definitions : list of flag names
+
+    Returns:
+    1. pcm              : the pcolormesh object
+"""
+def plot_flags(ax, time, cdf_data, flag_definitions=None):
+
+    # The CDF flags are integers representing bitwise flags.
+    # Different integers will return different lengths from np.binary_repr
+    # This section finds the maximum length for plotting reasons
+    longest_quality_flag = 0
+    for i in cdf_data:
+        if len(np.binary_repr(i)) > longest_quality_flag:
+            longest_quality_flag = len(np.binary_repr(i))
+
+    assert longest_quality_flag > 0, "Either you have provided invalid data or all flags are zero"
+
+    # Create the bitwise np array and populate it. Index 0 is first flag
+    qf_arr = np.zeros((len(quality_flag), longest_quality_flag))
+    for e, i in enumerate(quality_flag):
+        qf_binary = np.binary_repr(i)
+        len_qf = len(qf_binary)
+        qf_arr[e,0:len_qf] = list(map(int, qf_binary))
+
+    # Format the dat array into a format that pcolormesh can use
+    flags = np.sum(qf_arr, axis=0)
+    flags = np.where(flags > 0, 1, 0)
+    xi, yi = np.meshgrid(time, np.arange(0,longest_quality_flag+1,1))
+    qf_arr[qf_arr==0.0] = np.nan
+    qf_arr = np.einsum('ij,j->ij', qf_arr, np.arange(1,longest_quality_flag+1,1))
+    pcm = ax.pcolormesh(xi, yi, qf_arr[:-1,:].T, cmap='rainbow', norm=mpl.colors.Normalize(vmin=1,vmax=longest_quality_flag))
+
+    # If provided, use flag definitions
+    if not flag_definitions is None:
+        assert len(flag_definitions) == longest_quality_flag, "You have not provided enough flags names. Check they match!"
+
+        legend_arr = []
+        for e,i in enumerate(flags):
+            if i >= 1:
+                ax.text(time[0], e+0.5, flag_definitions[e]+'     -', transform=ax.transData, c='black', fontsize=5.5, ha='right', va='center_baseline')
+    
+    ax.set_ylim(0,longest_quality_flag)
+    # ax.set_ylabel("DES\nErr\nFlgs", rotation=0, verticalalignment='center')
+    ax.grid(True, which="both", linestyle="-", linewidth="0.2", c="0.5")
+    ax.set_yticklabels(['']*longest_quality_flag)
+
+    return pcm
