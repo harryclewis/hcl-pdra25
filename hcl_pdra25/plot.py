@@ -30,6 +30,7 @@ def plot_ts(ax, var, **kwargs):
                 ax.plot(i.time, i, c=kwargs['c'][e]) # index the color kwarg if multiple lines
             else:
                 ax.plot(i.time, i)
+
     # plotting single line, or magnitude of vector object
     else:
         if kwargs.get('plot_mag', False):
@@ -105,6 +106,13 @@ def plot_ts(ax, var, **kwargs):
         # modify the bounding box
         t.set_bbox(panel_bbox)
 
+    # customise y-ticks
+    if kwargs.get('yticks', None) is not None:
+        ax.set_yticks(kwargs['yticks'])
+
+        if kwargs.get('yticklabels', None) is not None:
+            ax.set_yticklabels(kwargs['yticklabels'])
+
 
 """ Function to plot a feather on a given time series axis """
 def plot_feather(ax, times, data, **kwargs):
@@ -168,6 +176,13 @@ def plot_feather(ax, times, data, **kwargs):
     # add a horizontal line if requested
     if kwargs.get('y_line', None) is not None:
         ax.axhline(kwargs['y_line'], c='black',ls='dashed')
+
+    # customise y-ticks
+    if kwargs.get('yticks', None) is not None:
+        ax.set_yticks(kwargs['yticks'])
+        
+        if kwargs.get('yticklabels', None) is not None:
+            ax.set_yticklabels(kwargs['yticklabels'])
 
 
 """ Function to plot a spectogram on a given axis """
