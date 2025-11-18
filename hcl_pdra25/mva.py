@@ -40,6 +40,53 @@ def mva(inp_data, flag='mvar'):
     return out_data, lamb, lmn
 
 
+""" Routine to implement Sonnerup1967 MVA (in a very explicit manner)"""
+def MVA_Sonnerup(ts_data, verbose=True):
+
+    # Determine element i,j of the covariance matrix
+    def cov_element(data, i, j):
+        return np.mean(data[:,i] * data[:,j]) - np.mean(data[:,i])*np.mean(data[:,j])
+
+    # Populate the covariance matrix
+    m_cov = np.empty((3,3))
+    m_cov[0,0] = cov_element(ts_data, 0, 0)
+    m_cov[0,1] = cov_element(ts_data, 0, 1)
+    m_cov[0,2] = cov_element(ts_data, 0, 2)
+    m_cov[1,0] = cov_element(ts_data, 1, 0)
+    m_cov[1,1] = cov_element(ts_data, 1, 1)
+    m_cov[1,2] = cov_element(ts_data, 1, 2)
+    m_cov[2,0] = cov_element(ts_data, 2, 0)
+    m_cov[2,1] = cov_element(ts_data, 2, 1)
+    m_cov[2,2] = cov_element(ts_data, 2, 2)
+
+    # Get the eigenvalues and eigenvectors
+    [eig_vals, eig_vecs] = np.linalg.eig(m_cov)
+
+    # Sort by eigenvalues
+    min_ind = np.argmin(eig_vals)
+    max_ind = np.argmax(eig_vals)
+    int_ind = [0,1,2]
+    int_ind.remove(min_ind)
+    int_ind.remove(max_ind)
+    int_ind = int_ind[0]
+
+    # Isolate LMN and eLMN into separate variables
+    L_vec = eig_vecs[max_ind]
+    M_vec = eig_vecs[int_ind]
+    N_vec = eig_vecs[min_ind]
+    L_eig = eig_vals[max_ind]
+    M_eig = eig_vals[int_ind]
+    N_eig = eig_vals[min_ind]
+
+    # Shorthand printing
+    if verbose:
+        print(f"L = {L_vec}, eL = {L_eig:.1f}")
+        print(f"M = {M_vec}, eM = {M_eig:.1f}")
+        print(f"N = {N_vec}, eN = {N_eig:.1f}")
+
+    return L_vec, M_vec, N_vec, L_eig, M_eig, N_eig
+
+
 """ Routine to compute Hybrid-MVA """
 def Hybrid_MVA(parameter, int1, int2, verbose=True):
 
