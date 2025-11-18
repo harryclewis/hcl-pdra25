@@ -137,10 +137,13 @@ def interpolate_jmap(data, t_s="", remove_idxs: list=[], dt=300*u.s, n_samples=N
 
 
 """ Combine two WISPR maps, a la heliophysicsPy Summer School 2024 """
-def combine_wispr_maps(inner_map, outer_map):
+def combine_wispr_maps(inner_map, outer_map, **kwargs):
 
     # define a normal map
-    wispr_norm = ImageNormalize(vmin=0, vmax=0.5e-11, stretch=PowerStretch(1/2.2))
+    if kwargs.__contains__('norm'):
+        wispr_norm = kwargs['norm']
+    else:
+        wispr_norm = ImageNormalize(vmin=0, vmax=0.5e-11, stretch=PowerStretch(1/2.2))
 
     # get a reference coord at the center of the inner_map
     ref_coord = SkyCoord(0*u.arcsec, 0*u.arcsec, frame=Helioprojective(observer=inner_map.observer_coordinate, obstime=inner_map.date))
