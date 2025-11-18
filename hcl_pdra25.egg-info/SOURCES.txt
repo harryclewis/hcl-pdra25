@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 hcl_pdra25/__init__.py
+hcl_pdra25/animate.py
 hcl_pdra25/basis.py
 hcl_pdra25/data.py
 hcl_pdra25/mva.py

@@ -3,8 +3,11 @@ hcl_pdra25: mva.py
 
 Minimum variance analysis functions
 """
-
+# 3rd party imports
 import numpy as np
+
+# 1st party imports
+from .data import get_parameter
 
 
 """ Simple MVA script, inspired by irfu-python package"""
@@ -35,3 +38,34 @@ def mva(inp_data, flag='mvar'):
     out_data = (lmn.T @ inp_data.T).T
 
     return out_data, lamb, lmn
+
+
+""" Routine to compute Hybrid-MVA """
+def Hybrid_MVA(parameter, int1, int2, verbose=True):
+
+    # Retrieve vector data
+    win1 = get_parameter(parameter, int1[0], int1[1])
+    win2 = get_parameter(parameter, int2[0], int2[1])
+    win = get_parameter(parameter, int1[0], int2[1])
+
+    # Average the intervals 
+    B1 = np.nanmean(win1.values, axis=0)
+    B2 = np.nanmean(win2.values, axis=0)
+
+    # Determine the N vector
+    N_vec = np.cross(B1, B2) / np.linalg.norm(np.cross(B1, B2))
+
+    # Determine LMN
+    L_vec_MVA, _, _, _, _, _ = MVA_Sonnerup(win.values, verbose=False)
+
+    # Use max-var (L) to create coordinate system
+    M_vec = np.cross(N_vec, L_vec_MVA)
+    L_vec = np.cross(M_vec, N_vec)
+
+    # Shorthand printing
+    if verbose:
+        print(f'L  = {L_vec}')
+        print(f'M  = {M_vec}')
+        print(f'N  = {N_vec}')
+
+    return L_vec, M_vec, N_vec
