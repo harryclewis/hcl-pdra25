@@ -41,7 +41,7 @@ def mva(inp_data, flag='mvar'):
 
 
 """ Routine to implement Sonnerup1967 MVA (in a very explicit manner)"""
-def MVA_Sonnerup(ts_data, verbose=True):
+def MVA_Sonnerup(ts_data, verbose=True, eigh=True):
 
     # Determine element i,j of the covariance matrix
     def cov_element(data, i, j):
@@ -60,7 +60,10 @@ def MVA_Sonnerup(ts_data, verbose=True):
     m_cov[2,2] = cov_element(ts_data, 2, 2)
 
     # Get the eigenvalues and eigenvectors
-    [eig_vals, eig_vecs] = np.linalg.eig(m_cov)
+    if eigh:
+        [eig_vals, eig_vecs] = np.linalg.eigh(m_cov)
+    else:
+        [eig_vals, eig_vecs] = np.linalg.eig(m_cov)
 
     # Sort by eigenvalues
     min_ind = np.argmin(eig_vals)
@@ -71,9 +74,9 @@ def MVA_Sonnerup(ts_data, verbose=True):
     int_ind = int_ind[0]
 
     # Isolate LMN and eLMN into separate variables
-    L_vec = eig_vecs[max_ind]
-    M_vec = eig_vecs[int_ind]
-    N_vec = eig_vecs[min_ind]
+    L_vec = eig_vecs[:, max_ind]
+    M_vec = eig_vecs[:, int_ind]
+    N_vec = eig_vecs[:, min_ind]
     L_eig = eig_vals[max_ind]
     M_eig = eig_vals[int_ind]
     N_eig = eig_vals[min_ind]
