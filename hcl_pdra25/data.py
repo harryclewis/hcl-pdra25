@@ -75,3 +75,18 @@ def construct_temperature_tensor(T):
     Ttens[:,1,2] = T[:,5] # Tyz
     Ttens[:,2,1] = T[:,5] # Tzy
     return Ttens
+
+
+""" Routine to return slice, or average, of a cdf.varget() variable """
+def slice_cdf_var(time, data, t_s, t_f, average=False):
+
+    # find indices which are in range t_s, t_f
+    idx_s = np.argmin(np.abs(t_s-time))
+    idx_f = np.argmin(np.abs(t_f-time))
+    data_slice = data[idx_s:idx_f+1]
+
+    # if average, return the mean of the slice
+    if average:
+        return np.nanmean(data_slice, axis=0)
+    else:
+        return data_slice
