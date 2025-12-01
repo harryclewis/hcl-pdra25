@@ -5,9 +5,11 @@ Contains plotting functions.
 """
 
 import matplotlib as mpl
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
+import pandas as pd
 
 
 """ Class to store information about a particular spectogram"""
@@ -467,3 +469,15 @@ def plot_flags(ax, time, cdf_data, flag_definitions=None):
     ax.set_yticklabels(['']*longest_quality_flag)
 
     return pcm
+
+
+""" Routine to quickly format time series plots """
+def format_timeseries(fig, ax, start_time: str, end_time: str, minor_minutes = 1):
+    majorlocator = mdates.AutoDateLocator(minticks=3, maxticks=12)
+    minorlocator = mdates.MinuteLocator(byminute=np.arange(0,60,minor_minutes))
+    formatter = mdates.ConciseDateFormatter(majorlocator, usetex=True, zero_formats=['', '%Y', '%b', '%-d %b', '%H:%M', '%H:%M'])
+    ax.xaxis.set_major_locator(majorlocator)
+    ax.xaxis.set_minor_locator(minorlocator)
+    ax.xaxis.set_major_formatter(formatter)
+    ax.set_xlim(pd.to_datetime(start_time), pd.to_datetime(end_time))
+    fig.align_ylabels()
