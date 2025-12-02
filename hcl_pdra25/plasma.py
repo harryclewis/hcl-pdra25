@@ -62,3 +62,15 @@ def calculate_vA(n_inp, B_inp, species: str = 'p'):
     rho = m * n
     v_A = np.einsum('t,t->t', B_mag, np.reciprocal(np.sqrt(constants.mu_0 * rho)))
     return v_A
+
+
+""" Function to calculate the instantaneous ion/electron inertial length """
+def calculate_inertial_length(n_s, species='i', density_factor=1e6, return_factor=1e-3):
+
+    if species == 'i':
+        m_s = constants.m_p
+    elif species == 'e':
+        m_s = constants.m_e
+
+    d_i = np.sqrt(m_s / (constants.mu_0 * constants.elementary_charge**2) * np.reciprocal(n_s.values * density_factor))
+    return np.squeeze(d_i) * return_factor
