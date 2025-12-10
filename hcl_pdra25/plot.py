@@ -53,12 +53,18 @@ def plot_ts(ax, var, **kwargs):
     if kwargs.get('ylim', None) is not None:
         ax.set_ylim(kwargs['ylim'])
 
-    # y-tick locators
+    # set the y-scale
     if kwargs.get('y_log', False):
-        ax.yaxis.set_major_locator(mticker.LogLocator())
         ax.set_yscale('log')
+
+    # set the y-ticks
+    if kwargs.__contains__('yticks'):
+        ax.set_yticks(kwargs['yticks'], labels=kwargs.get('yticklabels', None), minor=False) # No support for setting minor ticks
     else:
-        ax.yaxis.set_major_locator(mticker.MaxNLocator(5))
+        if kwargs.get('y_log', False):
+            ax.yaxis.set_major_locator(mticker.LogLocator(numticks=4))
+        else:
+            ax.yaxis.set_major_locator(mticker.MaxNLocator(5))
 
     # text to show that values are scaled (e.g. x10^10)
     if kwargs.get('scaling_text', None) is not None:
@@ -107,13 +113,6 @@ def plot_ts(ax, var, **kwargs):
 
         # modify the bounding box
         t.set_bbox(panel_bbox)
-
-    # customise y-ticks
-    if kwargs.get('yticks', None) is not None:
-        ax.set_yticks(kwargs['yticks'])
-
-        if kwargs.get('yticklabels', None) is not None:
-            ax.set_yticklabels(kwargs['yticklabels'])
 
 
 """ Function to plot a feather on a given time series axis """
